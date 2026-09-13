@@ -7,13 +7,20 @@ import {
   InboxIcon,
   LayoutDashboardIcon,
   LogOutIcon,
+  ChevronDownIcon,
   SendIcon,
   UsersIcon,
 } from "lucide-react"
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { isAdmin, signOut, useSession } from "@/lib/auth-client"
 import { cn } from "@/lib/utils"
 
@@ -75,39 +82,33 @@ export function Shell({ children }: { children: React.ReactNode }) {
             })}
           </nav>
 
-          {/* User login di kanan */}
-          <div className="ml-auto flex shrink-0 items-center gap-2">
-            <div className="hidden items-center gap-2.5 rounded-lg bg-white/10 py-1 pr-2.5 pl-2.5 sm:flex">
-              <Avatar className="size-7 text-[11px]">
-                <AvatarFallback className="bg-white/20 font-bold">{initials}</AvatarFallback>
-              </Avatar>
-              <span className="max-w-44 leading-tight">
-                <span className="block truncate text-xs font-semibold">{user?.name || "Petugas"}</span>
-                <span className="block truncate text-[10px] text-white/60">{user?.email}</span>
-              </span>
-            </div>
-            <Avatar className="size-7 sm:hidden">
-              <AvatarFallback className="bg-white/20 text-[11px] font-bold">{initials}</AvatarFallback>
-            </Avatar>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger
-                  render={
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={logout}
-                      className="text-white/70 hover:bg-white/10 hover:text-white dark:hover:bg-white/10"
-                    >
-                      <LogOutIcon />
-                    </Button>
-                  }
-                >
-                  <span className="sr-only">Keluar</span>
-                </TooltipTrigger>
-                <TooltipContent>Keluar</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+          {/* User login di kanan -> dropdown */}
+          <div className="ml-auto shrink-0">
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                className="flex items-center gap-2.5 rounded-lg bg-white/10 py-1 pr-2 pl-2.5 text-left transition hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-white/40"
+              >
+                <Avatar className="size-7 text-[11px]">
+                  <AvatarFallback className="bg-white/20 font-bold">{initials}</AvatarFallback>
+                </Avatar>
+                <span className="hidden max-w-44 leading-tight sm:block">
+                  <span className="block truncate text-xs font-semibold">{user?.name || "Petugas"}</span>
+                  <span className="block truncate text-[10px] text-white/60">{user?.email}</span>
+                </span>
+                <ChevronDownIcon className="hidden size-3.5 text-white/60 sm:block" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" side="bottom" sideOffset={8} className="min-w-56">
+                <DropdownMenuLabel className="leading-tight">
+                  <span className="block text-xs font-semibold">{user?.name || "Petugas"}</span>
+                  <span className="block truncate text-[11px] font-normal text-muted-foreground">{user?.email}</span>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem variant="destructive" onClick={logout}>
+                  <LogOutIcon />
+                  Keluar
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </header>
