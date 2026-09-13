@@ -2,11 +2,19 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { CheckCircle2Icon, InboxIcon, Loader2Icon, SendIcon } from "lucide-react"
+import { CheckCircle2Icon, InboxIcon, SendIcon } from "lucide-react"
 
 import { Shell } from "@/components/shell"
 import { LampiranField, type Lampiran } from "@/components/lampiran"
-import { cn } from "@/lib/utils"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { NativeSelect } from "@/components/ui/native-select"
+import { Spinner } from "@/components/ui/spinner"
+import { Textarea } from "@/components/ui/textarea"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 
 const KELASIFIKASI = ["421.2 (SMA)", "421.3 (Kesiswaan)", "800 (Kepegawaian)", "005 (Undangan)"]
 const SIFAT = ["Biasa", "Penting", "Segera", "Rahasia"]
@@ -21,10 +29,6 @@ type Jenis = "masuk" | "keluar"
 function today() {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jakarta" }).format(new Date())
 }
-
-const inputCls =
-  "h-10 w-full rounded-lg border border-border bg-background px-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/15"
-const labelCls = "mb-1.5 block text-xs font-semibold text-foreground/80"
 
 export default function InputSuratPage() {
   const router = useRouter()
@@ -85,137 +89,130 @@ export default function InputSuratPage() {
   const isMasuk = jenis === "masuk"
 
   return (
-    <Shell title="Input Surat" subtitle="Catat surat masuk atau keluar. Nomor agenda dibuat otomatis oleh sistem.">
+    <Shell>
       <div className="mx-auto max-w-3xl space-y-4">
         {/* Segmen jenis */}
-        <div className="grid grid-cols-2 gap-2 rounded-xl border border-border bg-card p-1.5 shadow-sm">
+        <ToggleGroup
+          className="w-full"
+          value={[jenis]}
+          onValueChange={(v) => v[0] && switchJenis(v[0] as Jenis)}
+          variant="default"
+          size="lg"
+          spacing={2}
+        >
           {(["masuk", "keluar"] as const).map((j) => {
             const Icon = j === "masuk" ? InboxIcon : SendIcon
-            const active = jenis === j
             return (
-              <button
-                key={j}
-                type="button"
-                onClick={() => switchJenis(j)}
-                className={cn(
-                  "flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition",
-                  active ? "bg-primary text-white shadow-sm" : "text-muted-foreground hover:bg-muted",
-                )}
-              >
-                <Icon className="size-4" />
+              <ToggleGroupItem key={j} value={j} className="flex-1 py-2 text-sm font-semibold">
+                <Icon />
                 Surat {j === "masuk" ? "Masuk" : "Keluar"}
-              </button>
+              </ToggleGroupItem>
             )
           })}
-        </div>
+        </ToggleGroup>
 
         {msg ? (
-          <p
-            className={cn(
-              "flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium ring-1 ring-inset",
-              msg.ok ? "bg-success/10 text-success ring-success/20" : "bg-destructive/10 text-destructive ring-destructive/20",
-            )}
-          >
-            {msg.ok ? <CheckCircle2Icon className="size-4 shrink-0" /> : null}
-            {msg.text}
-          </p>
+          <Alert variant={msg.ok ? "default" : "destructive"} className={msg.ok ? "border-success/30 bg-success/10 text-success [&_svg]:text-success" : undefined}>
+            {msg.ok ? <CheckCircle2Icon /> : undefined}
+            <AlertDescription>{msg.text}</AlertDescription>
+          </Alert>
         ) : null}
 
-        <form onSubmit={submit} className="card space-y-5 p-5 md:p-6">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="sm:col-span-2">
-              <label className={labelCls}>Nomor Agenda</label>
-              <div className="flex h-10 items-center gap-2 rounded-lg border border-dashed bg-muted/40 px-3 text-sm text-muted-foreground">
-                <span className="font-mono font-semibold text-foreground/70">{isMasuk ? "SM" : "SK"}-xxx</span>
-                Otomatis — tidak dapat diubah
+        <form onSubmit={submit}>
+          <Card>
+            <CardContent className="grid gap-4 pt-6 sm:grid-cols-2">
+              <div className="sm:col-span-2">
+                <Label>Nomor Agenda</Label>
+                <div className="mt-1.5 flex h-8 items-center gap-2 rounded-lg border border-dashed bg-muted/40 px-2.5 text-sm text-muted-foreground">
+                  <span className="font-mono font-semibold text-foreground/70">{isMasuk ? "SM" : "SK"}-xxx</span>
+                  Otomatis — tidak dapat diubah
+                </div>
               </div>
-            </div>
 
-            <div>
-              <label className={labelCls}>Nomor Surat *</label>
-              <input value={form.no_surat} onChange={set("no_surat")} required className={inputCls} placeholder={isMasuk ? "mis. 421.2/123/DISDIK" : "mis. 005/SMANSA/IX/2026"} />
-            </div>
-            <div>
-              <label className={labelCls}>{isMasuk ? "Tanggal Diterima" : "Tanggal Surat"}</label>
-              <input
-                type="date"
-                value={isMasuk ? form.tgl_terima : form.tgl_surat}
-                onChange={set(isMasuk ? "tgl_terima" : "tgl_surat")}
-                className={inputCls}
-              />
-            </div>
-
-            {isMasuk ? (
               <div>
-                <label className={labelCls}>Tanggal Surat</label>
-                <input type="date" value={form.tgl_surat} onChange={set("tgl_surat")} className={inputCls} />
+                <Label htmlFor="no_surat">Nomor Surat *</Label>
+                <Input id="no_surat" value={form.no_surat} onChange={set("no_surat")} required className="mt-1.5" placeholder={isMasuk ? "mis. 421.2/123/DISDIK" : "mis. 005/SMANSA/IX/2026"} />
               </div>
-            ) : (
               <div>
-                <label className={labelCls}>Cara Kirim</label>
-                <select value={form.cara_kirim} onChange={set("cara_kirim")} className={inputCls}>
-                  {CARA_KIRIM.map((k) => (<option key={k}>{k}</option>))}
-                </select>
+                <Label htmlFor="tgl1">{isMasuk ? "Tanggal Diterima" : "Tanggal Surat"}</Label>
+                <Input
+                  id="tgl1"
+                  type="date"
+                  value={isMasuk ? form.tgl_terima : form.tgl_surat}
+                  onChange={set(isMasuk ? "tgl_terima" : "tgl_surat")}
+                  className="mt-1.5"
+                />
               </div>
-            )}
 
-            <div>
-              <label className={labelCls}>Sifat Surat</label>
-              <select value={form.sifat} onChange={set("sifat")} className={inputCls}>
-                {SIFAT.map((k) => (<option key={k}>{k}</option>))}
-              </select>
-            </div>
+              {isMasuk ? (
+                <div>
+                  <Label htmlFor="tgl_surat">Tanggal Surat</Label>
+                  <Input id="tgl_surat" type="date" value={form.tgl_surat} onChange={set("tgl_surat")} className="mt-1.5" />
+                </div>
+              ) : (
+                <div>
+                  <Label>Cara Kirim</Label>
+                  <NativeSelect value={form.cara_kirim} onChange={set("cara_kirim")} className="mt-1.5">
+                    {CARA_KIRIM.map((k) => (<option key={k}>{k}</option>))}
+                  </NativeSelect>
+                </div>
+              )}
 
-            <div className="sm:col-span-2">
-              <label className={labelCls}>{isMasuk ? "Pengirim / Instansi Asal" : "Tujuan / Alamat Yang Dituju"}</label>
-              <input
-                value={isMasuk ? form.pengirim : form.tujuan}
-                onChange={set(isMasuk ? "pengirim" : "tujuan")}
-                className={inputCls}
-                placeholder={isMasuk ? "mis. Dinas Pendidikan Jawa Barat" : "mis. Cabang Dinas Pendidikan Wilayah IV"}
-              />
-            </div>
-
-            <div className="sm:col-span-2">
-              <label className={labelCls}>Perihal / Isi Ringkas</label>
-              <textarea value={form.perihal} onChange={set("perihal")} rows={3} className={cn(inputCls, "h-auto resize-y py-2")} placeholder="mis. Undangan rapat koordinasi" />
-            </div>
-
-            <div>
-              <label className={labelCls}>Kode Klasifikasi</label>
-              <select value={form.kode_klasifikasi} onChange={set("kode_klasifikasi")} className={inputCls}>
-                {KELASIFIKASI.map((k) => (<option key={k}>{k}</option>))}
-              </select>
-            </div>
-
-            {isMasuk ? (
               <div>
-                <label className={labelCls}>Tujuan Disposisi</label>
-                <input value={form.tujuan_disposisi} onChange={set("tujuan_disposisi")} className={inputCls} placeholder="Kepala Sekolah / Wakasek / TU" />
+                <Label>Sifat Surat</Label>
+                <NativeSelect value={form.sifat} onChange={set("sifat")} className="mt-1.5">
+                  {SIFAT.map((k) => (<option key={k}>{k}</option>))}
+                </NativeSelect>
               </div>
-            ) : null}
 
-            <div className={isMasuk ? "" : "sm:col-span-2"}>
-              <label className={labelCls}>Status</label>
-              <select value={form.status} onChange={set("status")} className={inputCls}>
-                {STATUS[jenis].map((k) => (<option key={k}>{k}</option>))}
-              </select>
+              <div className="sm:col-span-2">
+                <Label htmlFor="pihak">{isMasuk ? "Pengirim / Instansi Asal" : "Tujuan / Alamat Yang Dituju"}</Label>
+                <Input
+                  id="pihak"
+                  value={isMasuk ? form.pengirim : form.tujuan}
+                  onChange={set(isMasuk ? "pengirim" : "tujuan")}
+                  className="mt-1.5"
+                  placeholder={isMasuk ? "mis. Dinas Pendidikan Jawa Barat" : "mis. Cabang Dinas Pendidikan Wilayah IV"}
+                />
+              </div>
+
+              <div className="sm:col-span-2">
+                <Label htmlFor="perihal">Perihal / Isi Ringkas</Label>
+                <Textarea id="perihal" value={form.perihal} onChange={set("perihal")} rows={3} className="mt-1.5" placeholder="mis. Undangan rapat koordinasi" />
+              </div>
+
+              <div>
+                <Label>Kode Klasifikasi</Label>
+                <NativeSelect value={form.kode_klasifikasi} onChange={set("kode_klasifikasi")} className="mt-1.5">
+                  {KELASIFIKASI.map((k) => (<option key={k}>{k}</option>))}
+                </NativeSelect>
+              </div>
+
+              {isMasuk ? (
+                <div>
+                  <Label htmlFor="disposisi">Tujuan Disposisi</Label>
+                  <Input id="disposisi" value={form.tujuan_disposisi} onChange={set("tujuan_disposisi")} className="mt-1.5" placeholder="Kepala Sekolah / Wakasek / TU" />
+                </div>
+              ) : null}
+
+              <div>
+                <Label>Status</Label>
+                <NativeSelect value={form.status} onChange={set("status")} className="mt-1.5">
+                  {STATUS[jenis].map((k) => (<option key={k}>{k}</option>))}
+                </NativeSelect>
+              </div>
+
+              <LampiranField value={lampiran} onChange={setLampiran} jenis={jenis} label={isMasuk ? "Scan Surat Masuk (PDF / gambar)" : "Scan Surat Keluar (PDF / gambar)"} />
+            </CardContent>
+
+            <div className="flex items-center justify-between border-t px-6 py-4">
+              <p className="text-[11px] text-muted-foreground">* wajib diisi</p>
+              <Button type="submit" size="lg" disabled={saving}>
+                {saving ? <Spinner /> : <CheckCircle2Icon />}
+                {saving ? "Menyimpan..." : `Simpan Surat ${isMasuk ? "Masuk" : "Keluar"}`}
+              </Button>
             </div>
-
-            <LampiranField value={lampiran} onChange={setLampiran} jenis={jenis} label={isMasuk ? "Scan Surat Masuk (PDF / gambar)" : "Scan Surat Keluar (PDF / gambar)"} />
-          </div>
-
-          <div className="flex items-center justify-between border-t pt-4">
-            <p className="text-[11px] text-muted-foreground">* wajib diisi</p>
-            <button
-              type="submit"
-              disabled={saving}
-              className="flex h-10 items-center gap-2 rounded-lg bg-primary px-6 text-sm font-semibold text-white transition hover:bg-primary/90 disabled:opacity-50"
-            >
-              {saving ? <Loader2Icon className="size-4 animate-spin" /> : <CheckCircle2Icon className="size-4" />}
-              {saving ? "Menyimpan..." : `Simpan Surat ${isMasuk ? "Masuk" : "Keluar"}`}
-            </button>
-          </div>
+          </Card>
         </form>
       </div>
     </Shell>

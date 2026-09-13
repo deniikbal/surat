@@ -2,8 +2,13 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { AlertCircleIcon, ArrowRightIcon, FileTextIcon, Loader2Icon } from "lucide-react"
+import { AlertCircleIcon, ArrowRightIcon, CheckIcon, FileTextIcon } from "lucide-react"
 
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Spinner } from "@/components/ui/spinner"
 import { signIn, signUp } from "@/lib/auth-client"
 
 export default function LoginPage() {
@@ -49,9 +54,6 @@ export default function LoginPage() {
     }
   }
 
-  const inputCls =
-    "h-11 w-full rounded-lg border border-border bg-background px-3.5 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/15"
-
   return (
     <main className="flex min-h-svh">
       {/* Panel kiri (desktop) */}
@@ -77,7 +79,7 @@ export default function LoginPage() {
               "Dashboard ringkas: surat perlu diproses, sifat penting",
             ].map((t) => (
               <li key={t} className="flex items-start gap-2.5">
-                <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-white/50" />
+                <CheckIcon className="mt-0.5 size-4 shrink-0 text-white/50" />
                 {t}
               </li>
             ))}
@@ -107,36 +109,41 @@ export default function LoginPage() {
           </div>
 
           {error ? (
-            <p className="flex items-center gap-2 rounded-lg bg-destructive/10 px-3.5 py-3 text-sm font-medium text-destructive ring-1 ring-destructive/20 ring-inset">
-              <AlertCircleIcon className="size-4 shrink-0" />
-              {error}
-            </p>
+            <Alert variant="destructive">
+              <AlertCircleIcon />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
           ) : null}
 
           {needsSetup && !checking ? (
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Nama lengkap"
-              autoComplete="name"
-              className={inputCls}
-            />
+            <div>
+              <Label htmlFor="name">Nama lengkap</Label>
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                autoComplete="name"
+                className="mt-1.5 h-10"
+              />
+            </div>
           ) : null}
           <div>
-            <label className="mb-1.5 block text-xs font-semibold text-foreground/80">Email</label>
-            <input
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               type="email"
               required
               placeholder="tu@smansaba.sch.id"
               autoComplete="email"
-              className={inputCls}
+              className="mt-1.5 h-10"
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-semibold text-foreground/80">Password</label>
-            <input
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               type="password"
@@ -144,24 +151,14 @@ export default function LoginPage() {
               minLength={8}
               placeholder="Minimal 8 karakter"
               autoComplete={needsSetup ? "new-password" : "current-password"}
-              className={inputCls}
+              className="mt-1.5 h-10"
             />
           </div>
 
-          <button
-            type="submit"
-            disabled={loading || checking}
-            className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-primary text-sm font-semibold text-white transition hover:bg-primary/90 disabled:opacity-50"
-          >
-            {loading ? (
-              <Loader2Icon className="size-4 animate-spin" />
-            ) : (
-              <>
-                {needsSetup ? "Buat Akun & Masuk" : "Masuk"}
-                <ArrowRightIcon className="size-4" />
-              </>
-            )}
-          </button>
+          <Button type="submit" size="lg" disabled={loading || checking} className="h-10 w-full">
+            {loading ? <Spinner /> : <ArrowRightIcon />}
+            {needsSetup ? "Buat Akun & Masuk" : "Masuk"}
+          </Button>
 
           <p className="text-center text-[11px] text-muted-foreground lg:text-left">
             Akses khusus petugas TU &amp; pimpinan sekolah.

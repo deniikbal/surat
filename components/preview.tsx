@@ -1,7 +1,16 @@
 "use client"
 
-import { DownloadIcon, FileTextIcon, Loader2Icon, XIcon } from "lucide-react"
+import { DownloadIcon, FileTextIcon } from "lucide-react"
 import { useState } from "react"
+
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Spinner } from "@/components/ui/spinner"
 
 export type PreviewItem = { fileId: string; fileName: string }
 
@@ -18,45 +27,32 @@ export function PreviewModal({ item, onClose }: { item: PreviewItem | null; onCl
     : `https://drive.google.com/file/d/${item.fileId}/preview`
 
   return (
-    <div
-      className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-black/60 p-4"
-      onClick={onClose}
-      onKeyDown={(e) => e.key === "Escape" && onClose()}
-      role="dialog"
-      aria-label={`Pratinjau ${item.fileName}`}
-    >
-      <div
-        className="flex h-[70vh] max-h-[640px] w-full max-w-3xl flex-col overflow-hidden rounded-xl bg-card shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex shrink-0 items-center gap-3 border-b px-4 py-2.5">
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-3xl gap-0 p-0 sm:max-w-[min(calc(100%-2rem),768px)]">
+        <DialogHeader className="flex-row items-center gap-3 border-b px-4 py-2.5 pr-12 text-left">
           <FileTextIcon className="size-4 shrink-0 text-primary" />
-          <p className="min-w-0 flex-1 truncate text-sm font-semibold" title={item.fileName}>
+          <DialogTitle className="min-w-0 flex-1 truncate text-sm" title={item.fileName}>
             {item.fileName}
-          </p>
-          <a
-            href={`https://drive.google.com/uc?export=download&id=${item.fileId}`}
-            target="_blank"
-            rel="noreferrer"
-            title="Unduh berkas"
-            className="flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-xs font-semibold text-muted-foreground transition hover:bg-muted hover:text-foreground"
+          </DialogTitle>
+          <Button
+            variant="ghost"
+            size="sm"
+            render={
+              <a
+                href={`https://drive.google.com/uc?export=download&id=${item.fileId}`}
+                target="_blank"
+                rel="noreferrer"
+              />
+            }
           >
-            <DownloadIcon className="size-4" /> Unduh
-          </a>
-          <button
-            type="button"
-            onClick={onClose}
-            className="grid size-8 place-items-center rounded-lg text-muted-foreground transition hover:bg-muted hover:text-foreground"
-            aria-label="Tutup pratinjau"
-          >
-            <XIcon className="size-4" />
-          </button>
-        </div>
+            <DownloadIcon /> Unduh
+          </Button>
+        </DialogHeader>
 
-        <div className="relative min-h-0 flex-1 bg-muted/30">
+        <div className="relative h-[60vh] max-h-[560px] min-h-0 flex-1 bg-muted/30">
           {loading ? (
             <div className="absolute inset-0 grid place-items-center">
-              <Loader2Icon className="size-6 animate-spin text-muted-foreground" />
+              <Spinner className="size-6 text-muted-foreground" />
             </div>
           ) : null}
           {img ? (
@@ -77,7 +73,7 @@ export function PreviewModal({ item, onClose }: { item: PreviewItem | null; onCl
             />
           )}
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }

@@ -1,9 +1,12 @@
 "use client"
 
 import { useRef, useState } from "react"
-import { EyeIcon, FileTextIcon, Loader2Icon, PaperclipIcon, XIcon } from "lucide-react"
+import { EyeIcon, FileTextIcon, PaperclipIcon, XIcon } from "lucide-react"
 
 import { PreviewModal } from "@/components/preview"
+import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { Spinner } from "@/components/ui/spinner"
 import { cn } from "@/lib/utils"
 
 export type Lampiran = { file_id: string; file_name: string }
@@ -67,9 +70,9 @@ export function LampiranField({
 
   return (
     <div className="sm:col-span-2">
-      <label className="mb-1.5 block text-xs font-semibold text-foreground/80">{label}</label>
+      <Label>{label}</Label>
       {value ? (
-        <div className="flex items-center gap-2.5 rounded-lg border border-border bg-muted/40 px-3 py-2.5">
+        <div className="mt-1.5 flex items-center gap-2.5 rounded-lg border border-border bg-muted/40 px-3 py-2.5">
           <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
             <FileTextIcon className="size-4" />
           </span>
@@ -85,18 +88,20 @@ export function LampiranField({
           {preview ? (
             <PreviewModal item={{ fileId: value.file_id, fileName: value.file_name }} onClose={() => setPreview(false)} />
           ) : null}
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon"
+            title="Hapus lampiran"
             onClick={() => {
               // Lampiran dari form Input (belum tertaut surat) → hapus dari Drive juga.
               if (!id) hapusLampiranDrive(value.file_id)
               onChange(null)
             }}
-            title="Hapus lampiran"
-            className="grid size-7 shrink-0 place-items-center rounded-lg text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive"
+            className="shrink-0 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
           >
-            <XIcon className="size-4" />
-          </button>
+            <XIcon />
+          </Button>
         </div>
       ) : (
         <button
@@ -104,12 +109,12 @@ export function LampiranField({
           onClick={() => inputRef.current?.click()}
           disabled={busy}
           className={cn(
-            "flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-dashed text-sm font-medium transition",
+            "mt-1.5 flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-dashed text-sm font-medium transition",
             busy ? "opacity-60" : "hover:border-primary/50 hover:bg-muted/50",
             err ? "border-destructive/50 text-destructive" : "text-muted-foreground",
           )}
         >
-          {busy ? <Loader2Icon className="size-4 animate-spin" /> : <PaperclipIcon className="size-4" />}
+          {busy ? <Spinner /> : <PaperclipIcon className="size-4" />}
           {busy ? "Mengunggah ke Drive..." : "Pilih berkas (maks. 15 MB)"}
         </button>
       )}
