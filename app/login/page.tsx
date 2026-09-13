@@ -1,8 +1,9 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { AlertCircleIcon, ArrowRightIcon, CheckIcon, FileTextIcon } from "lucide-react"
+import { AlertCircleIcon, ArrowLeftIcon, ArrowRightIcon, CheckIcon, FileTextIcon } from "lucide-react"
 
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
@@ -47,7 +48,7 @@ export default function LoginPage() {
         setError("Email atau password salah")
         return
       }
-      router.push("/")
+      router.push("/dashboard")
       router.refresh()
     } finally {
       setLoading(false)
@@ -55,28 +56,106 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-svh">
-      {/* Panel kiri (desktop) */}
-      <div className="relative hidden w-1/2 flex-col justify-between bg-primary p-10 text-primary-foreground lg:flex">
+    <main className="grid min-h-svh lg:grid-cols-2">
+      {/* Form (kiri) */}
+      <div className="flex flex-col px-6 py-8 sm:px-10 lg:px-14">
+        <Link href="/" className="flex w-fit items-center gap-2 text-xs font-medium text-muted-foreground transition hover:text-foreground">
+          <ArrowLeftIcon className="size-3.5" /> Kembali ke halaman depan
+        </Link>
+
+        <div className="flex flex-1 items-center justify-center py-10">
+          <form onSubmit={submit} className="w-full max-w-sm space-y-4">
+            <div className="space-y-1.5">
+              <div className="grid size-11 place-items-center rounded-xl bg-primary/10 text-primary">
+                <FileTextIcon className="size-5" />
+              </div>
+              <h1 className="pt-2 text-xl font-bold tracking-tight">
+                {checking ? "Memuat..." : needsSetup ? "Buat Akun Administrator" : "Selamat datang kembali"}
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                {checking
+                  ? " "
+                  : needsSetup
+                    ? "Belum ada akun — akun pertama menjadi administrator."
+                    : "Masuk untuk mengelola persuratan SMAN 1 Bantarujeg."}
+              </p>
+            </div>
+
+            {error ? (
+              <Alert variant="destructive">
+                <AlertCircleIcon />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            ) : null}
+
+            {needsSetup && !checking ? (
+              <div>
+                <Label htmlFor="name">Nama lengkap</Label>
+                <Input id="name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className="mt-1.5 h-10" />
+              </div>
+            ) : null}
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                type="email"
+                required
+                placeholder="tu@smansaba.sch.id"
+                autoComplete="email"
+                className="mt-1.5 h-10"
+              />
+            </div>
+            <div>
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                type="password"
+                required
+                minLength={8}
+                placeholder="Minimal 8 karakter"
+                autoComplete={needsSetup ? "new-password" : "current-password"}
+                className="mt-1.5 h-10"
+              />
+            </div>
+
+            <Button type="submit" size="lg" disabled={loading || checking} className="h-10 w-full">
+              {loading ? <Spinner /> : <ArrowRightIcon />}
+              {needsSetup ? "Buat Akun & Masuk" : "Masuk"}
+            </Button>
+
+            <p className="text-center text-[11px] text-muted-foreground">
+              Akses khusus petugas TU &amp; pimpinan sekolah.
+            </p>
+          </form>
+        </div>
+      </div>
+
+      {/* Hero (kanan) — hanya desktop */}
+      <div className="relative hidden flex-col justify-between overflow-hidden bg-primary p-12 text-primary-foreground lg:flex">
         <div className="flex items-center gap-2.5">
-          <div className="grid size-9 place-items-center rounded-lg bg-white/15">
-            <FileTextIcon className="size-5 text-foreground" />
+          <div className="grid size-9 place-items-center rounded-lg bg-black/10">
+            <FileTextIcon className="size-5" />
           </div>
           <div>
-            <p className="text-sm font-bold text-foreground">Persuratan</p>
+            <p className="text-sm font-bold">Persuratan</p>
             <p className="text-[11px] text-foreground/60">SMAN 1 Bantarujeg</p>
           </div>
         </div>
 
-        <div className="max-w-sm">
-          <h2 className="text-2xl font-bold leading-snug text-foreground">
+        <div className="max-w-md">
+          <h2 className="text-3xl font-bold leading-snug">
             Kelola agenda surat masuk &amp; keluar dalam satu tempat.
           </h2>
-          <ul className="mt-6 space-y-3 text-sm text-foreground/70">
+          <ul className="mt-7 space-y-3.5 text-sm text-foreground/75">
             {[
               "Nomor agenda otomatis (SM-001, SK-001, ...)",
               "Register bisa dicari & difilter per status",
-              "Dashboard ringkas: surat perlu diproses, sifat penting",
+              "Lampiran scan tersimpan digital di Google Drive",
+              "Dashboard ringkas: surat menunggu & sifat penting",
             ].map((t) => (
               <li key={t} className="flex items-start gap-2.5">
                 <CheckIcon className="mt-0.5 size-4 shrink-0 text-foreground/50" />
@@ -87,83 +166,6 @@ export default function LoginPage() {
         </div>
 
         <p className="text-[11px] text-foreground/40">Sistem Informasi Persuratan Sekolah</p>
-      </div>
-
-      {/* Form */}
-      <div className="flex w-full items-center justify-center bg-background px-4 py-10 lg:w-1/2">
-        <form onSubmit={submit} className="w-full max-w-sm space-y-4">
-          <div className="space-y-1.5 text-center lg:text-left">
-            <div className="mx-auto grid size-11 place-items-center rounded-xl bg-primary/10 text-primary lg:hidden">
-              <FileTextIcon className="size-5" />
-            </div>
-            <h1 className="text-xl font-bold tracking-tight">
-              {checking ? "Memuat..." : needsSetup ? "Buat Akun Administrator" : "Masuk"}
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              {checking
-                ? " "
-                : needsSetup
-                  ? "Belum ada akun — akun pertama menjadi administrator."
-                  : "Silakan masuk untuk mengelola persuratan."}
-            </p>
-          </div>
-
-          {error ? (
-            <Alert variant="destructive">
-              <AlertCircleIcon />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          ) : null}
-
-          {needsSetup && !checking ? (
-            <div>
-              <Label htmlFor="name">Nama lengkap</Label>
-              <Input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                autoComplete="name"
-                className="mt-1.5 h-10"
-              />
-            </div>
-          ) : null}
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              type="email"
-              required
-              placeholder="tu@smansaba.sch.id"
-              autoComplete="email"
-              className="mt-1.5 h-10"
-            />
-          </div>
-          <div>
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              type="password"
-              required
-              minLength={8}
-              placeholder="Minimal 8 karakter"
-              autoComplete={needsSetup ? "new-password" : "current-password"}
-              className="mt-1.5 h-10"
-            />
-          </div>
-
-          <Button type="submit" size="lg" disabled={loading || checking} className="h-10 w-full">
-            {loading ? <Spinner /> : <ArrowRightIcon />}
-            {needsSetup ? "Buat Akun & Masuk" : "Masuk"}
-          </Button>
-
-          <p className="text-center text-[11px] text-muted-foreground lg:text-left">
-            Akses khusus petugas TU &amp; pimpinan sekolah.
-          </p>
-        </form>
       </div>
     </main>
   )

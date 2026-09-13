@@ -102,6 +102,15 @@ export function SuratHalaman({ jenis }: { jenis: Jenis }) {
     load()
   }, [load])
 
+  // Modal "Catat Surat" di navbar bisa menyimpan dari halaman mana pun.
+  useEffect(() => {
+    function onSaved() {
+      load()
+    }
+    window.addEventListener("surat-saved", onSaved)
+    return () => window.removeEventListener("surat-saved", onSaved)
+  }, [load])
+
   function resetFilter(fn: () => void) {
     fn()
     setPage(1)
