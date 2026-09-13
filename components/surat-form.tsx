@@ -186,8 +186,9 @@ export function SuratFormDialog({
         </DialogHeader>
 
         <form onSubmit={submit}>
-          <div className="grid gap-4 py-2 sm:grid-cols-2">
-            <div>
+          {/* grid 6 kolom: 3 kolom = span-2, 2 kolom = span-3, penuh = span-6 */}
+          <div className="grid gap-4 py-2 sm:grid-cols-6">
+            <div className="sm:col-span-3">
               <Label htmlFor={`no_surat-${jenis}`}>Nomor Surat *</Label>
               <Input
                 id={`no_surat-${jenis}`}
@@ -199,45 +200,38 @@ export function SuratFormDialog({
               />
             </div>
             {isMasuk ? (
-              <>
-                <div>
-                  <Label htmlFor={`tgl_terima-${jenis}`}>Tanggal Diterima</Label>
-                  <Input id={`tgl_terima-${jenis}`} type="date" value={form.tgl_terima} onChange={set("tgl_terima")} className="mt-1.5" />
-                </div>
-                <div>
-                  <Label htmlFor={`tgl_surat-${jenis}`}>Tanggal Surat</Label>
-                  <Input id={`tgl_surat-${jenis}`} type="date" value={form.tgl_surat} onChange={set("tgl_surat")} className="mt-1.5" />
-                </div>
-              </>
+              <div className="sm:col-span-3">
+                <Label htmlFor={`tgl_terima-${jenis}`}>Tanggal Diterima</Label>
+                <Input id={`tgl_terima-${jenis}`} type="date" value={form.tgl_terima} onChange={set("tgl_terima")} className="mt-1.5" />
+              </div>
             ) : (
-              <>
-                <div>
-                  <Label htmlFor={`tgl_surat-${jenis}`}>Tanggal Surat</Label>
-                  <Input id={`tgl_surat-${jenis}`} type="date" value={form.tgl_surat} onChange={set("tgl_surat")} className="mt-1.5" />
-                </div>
-                <div>
-                  <Label>Cara Kirim</Label>
-                  <NativeSelect value={form.cara_kirim} onChange={set("cara_kirim")} className="mt-1.5">
-                    {CARA_KIRIM.map((k) => (<option key={k}>{k}</option>))}
-                  </NativeSelect>
-                </div>
-              </>
+              <div className="sm:col-span-3">
+                <Label>Cara Kirim</Label>
+                <NativeSelect value={form.cara_kirim} onChange={set("cara_kirim")} className="mt-1.5 w-full">
+                  {CARA_KIRIM.map((k) => (<option key={k}>{k}</option>))}
+                </NativeSelect>
+              </div>
             )}
 
-            <div>
+            {/* 1 baris 3 kolom: Tanggal Surat | Sifat | Kode Klasifikasi */}
+            <div className="sm:col-span-2">
+              <Label htmlFor={`tgl_surat-${jenis}`}>Tanggal Surat</Label>
+              <Input id={`tgl_surat-${jenis}`} type="date" value={form.tgl_surat} onChange={set("tgl_surat")} className="mt-1.5" />
+            </div>
+            <div className="sm:col-span-2">
               <Label>Sifat Surat</Label>
-              <NativeSelect value={form.sifat} onChange={set("sifat")} className="mt-1.5">
+              <NativeSelect value={form.sifat} onChange={set("sifat")} className="mt-1.5 w-full">
                 {SIFAT.map((k) => (<option key={k}>{k}</option>))}
               </NativeSelect>
             </div>
-            <div>
+            <div className="sm:col-span-2">
               <Label>Kode Klasifikasi</Label>
-              <NativeSelect value={form.kode_klasifikasi} onChange={set("kode_klasifikasi")} className="mt-1.5">
+              <NativeSelect value={form.kode_klasifikasi} onChange={set("kode_klasifikasi")} className="mt-1.5 w-full">
                 {[...new Set([...KELASIFIKASI, form.kode_klasifikasi].filter(Boolean))].map((k) => (<option key={k}>{k}</option>))}
               </NativeSelect>
             </div>
 
-            <div className="sm:col-span-2">
+            <div className="sm:col-span-6">
               <Label htmlFor={`pihak-${jenis}`}>{isMasuk ? "Pengirim / Instansi Asal" : "Tujuan / Alamat Yang Dituju"}</Label>
               <Input
                 id={`pihak-${jenis}`}
@@ -248,41 +242,43 @@ export function SuratFormDialog({
               />
             </div>
 
-            <div className="sm:col-span-2">
+            <div className="sm:col-span-6">
               <Label htmlFor={`perihal-${jenis}`}>Perihal / Isi Ringkas</Label>
               <Textarea id={`perihal-${jenis}`} value={form.perihal} onChange={set("perihal")} rows={2} className="mt-1.5" placeholder="mis. Undangan rapat koordinasi" />
             </div>
 
             {isMasuk ? (
               <>
-                <div>
+                <div className="sm:col-span-3">
                   <Label htmlFor={`disposisi-${jenis}`}>Tujuan Disposisi</Label>
                   <Input id={`disposisi-${jenis}`} value={form.tujuan_disposisi} onChange={set("tujuan_disposisi")} className="mt-1.5" placeholder="Kepala Sekolah / Wakasek / TU" />
                 </div>
-                <div>
+                <div className="sm:col-span-3">
                   <Label>Status</Label>
-                  <NativeSelect value={form.status} onChange={set("status")} className="mt-1.5">
+                  <NativeSelect value={form.status} onChange={set("status")} className="mt-1.5 w-full">
                     {[...new Set([...STATUS[jenis], form.status])].map((k) => (<option key={k}>{k}</option>))}
                   </NativeSelect>
                 </div>
               </>
             ) : (
-              <div>
+              <div className="sm:col-span-3">
                 <Label>Status</Label>
-                <NativeSelect value={form.status} onChange={set("status")} className="mt-1.5">
+                <NativeSelect value={form.status} onChange={set("status")} className="mt-1.5 w-full">
                   {[...new Set([...STATUS[jenis], form.status])].map((k) => (<option key={k}>{k}</option>))}
                 </NativeSelect>
               </div>
             )}
 
             {/* Unggah langsung ke Drive (mode edit: dengan id → tautan tersimpan di baris ini). */}
-            <LampiranField
-              value={lampiran}
-              jenis={jenis}
-              id={surat?.id}
-              onChange={(l) => setLampiran(l)}
-              label={isMasuk ? "Scan Surat Masuk (PDF / gambar)" : "Scan Surat Keluar (PDF / gambar)"}
-            />
+            <div className="sm:col-span-6">
+              <LampiranField
+                value={lampiran}
+                jenis={jenis}
+                id={surat?.id}
+                onChange={(l) => setLampiran(l)}
+                label={isMasuk ? "Scan Surat Masuk (PDF / gambar)" : "Scan Surat Keluar (PDF / gambar)"}
+              />
+            </div>
           </div>
 
           {err ? <p className="text-xs font-medium text-destructive">{err}</p> : null}
