@@ -7,6 +7,7 @@ import {
   InboxIcon,
   LayoutDashboardIcon,
   LogOutIcon,
+  SendIcon,
 } from "lucide-react"
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -17,8 +18,8 @@ import { cn } from "@/lib/utils"
 
 const MENU = [
   { href: "/", label: "Dashboard", icon: LayoutDashboardIcon },
-  { href: "/input", label: "Input Surat", icon: FileTextIcon },
-  { href: "/data", label: "Register", icon: InboxIcon },
+  { href: "/surat-masuk", label: "Surat Masuk", icon: InboxIcon },
+  { href: "/surat-keluar", label: "Surat Keluar", icon: SendIcon },
 ]
 
 export function Shell({ children }: { children: React.ReactNode }) {

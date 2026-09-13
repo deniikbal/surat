@@ -35,22 +35,38 @@ export default function DashboardPage() {
   const [masuk, setMasuk] = useState<Surat[] | null>(null)
   const [keluar, setKeluar] = useState<Surat[] | null>(null)
 
+  const [statsMasuk, setStatsMasuk] = useState<Record<string, number>>({})
+  const [statsKeluar, setStatsKeluar] = useState<Record<string, number>>({})
+
   useEffect(() => {
-    fetch("/api/surat")
+    fetch("/api/surat?per_page=6")
       .then((r) => r.json())
-      .then((d) => setMasuk(Array.isArray(d.surat) ? d.surat : []))
+      .then((d) => {
+        setMasuk(Array.isArray(d.surat) ? d.surat : [])
+        setStatsMasuk(d.stats ?? {})
+      })
       .catch(() => setMasuk([]))
-    fetch("/api/surat?jenis=keluar")
+    fetch("/api/surat?jenis=keluar&per_page=6")
       .then((r) => r.json())
-      .then((d) => setKeluar(Array.isArray(d.surat) ? d.surat : []))
+      .then((d) => {
+        setKeluar(Array.isArray(d.surat) ? d.surat : [])
+        setStatsKeluar(d.stats ?? {})
+      })
       .catch(() => setKeluar([]))
   }, [])
 
-  const c = (rows: Surat[] | null, fn: (s: Surat) => boolean) => (rows ?? []).filter(fn).length
-  const belum = c(masuk, (s) => s.status === "Belum Diproses")
-  const proses = c(masuk, (s) => s.status === "Dalam Proses")
-  const draft = c(keluar, (s) => s.status === "Draft")
-  const urgent = c(masuk, (s) => s.sifat === "Penting" || s.sifat === "Segera") + c(keluar, (s) => s.sifat === "Penting" || s.sifat === "Segera")
+  // statistik dari API (tidak terpengaruh pagination); baris hanya utk timeline
+  const belum = statsMasuk["Belum Diproses"] ?? 0
+  const proses = statsMasuk["Dalam Proses"] ?? 0
+  const selesai = statsMasuk["Selesai"] ?? 0
+  const draft = statsKeluar["Draft"] ?? 0
+  const dikirim = statsKeluar["Dikirim"] ?? 0
+  const arsip = statsKeluar["Arsip"] ?? 0
+  const totalMasuk = statsMasuk.total ?? 0
+  const totalKeluar = statsKeluar.total ?? 0
+  const urgent =
+    (statsMasuk["sifat:Penting"] ?? 0) + (statsMasuk["sifat:Segera"] ?? 0) +
+    (statsKeluar["sifat:Penting"] ?? 0) + (statsKeluar["sifat:Segera"] ?? 0)
 
   // gabungan terbaru masuk+keluar utk timeline
   const recent: Array<Surat & { _jenis: "masuk" | "keluar" }> = [
@@ -72,10 +88,10 @@ export default function DashboardPage() {
         <div className="space-y-5">
           {/* Kartu statistik */}
           <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-            <Stat icon={MailMinusIcon} label="Surat Masuk" value={masuk?.length ?? 0} note="Total tercatat" href="/data" tone="primary" />
-            <Stat icon={MailPlusIcon} label="Surat Keluar" value={keluar?.length ?? 0} note="Total tercatat" href="/data" tone="info" />
-            <Stat icon={TimerIcon} label="Perlu Diproses" value={belum + proses + draft} note={`${belum} masuk · ${proses} proses · ${draft} draft`} href="/data" tone="warning" />
-            <Stat icon={SendIcon} label="Sifat Penting/Segera" value={urgent} note="Perlu perhatian" href="/data" tone="destructive" />
+            <Stat icon={MailMinusIcon} label="Surat Masuk" value={totalMasuk} note="Total tercatat" href="/surat-masuk" tone="primary" />
+            <Stat icon={MailPlusIcon} label="Surat Keluar" value={totalKeluar} note="Total tercatat" href="/surat-keluar" tone="info" />
+            <Stat icon={TimerIcon} label="Perlu Diproses" value={belum + proses + draft} note={`${belum} masuk · ${proses} proses · ${draft} draft`} href="/surat-masuk" tone="warning" />
+            <Stat icon={SendIcon} label="Sifat Penting/Segera" value={urgent} note="Perlu perhatian" href="/surat-masuk" tone="destructive" />
           </div>
 
           <div className="grid gap-5 xl:grid-cols-[1.4fr_1fr]">
@@ -83,7 +99,7 @@ export default function DashboardPage() {
             <Card>
               <CardHeader className="flex-row items-center justify-between">
                 <CardTitle className="text-sm font-bold">Aktivitas Surat Terbaru</CardTitle>
-                <Link href="/data" className="flex items-center gap-1 text-xs font-medium text-primary hover:underline">
+                <Link href="/surat-masuk" className="flex items-center gap-1 text-xs font-medium text-primary hover:underline">
                   Lihat semua <ArrowUpRightIcon className="size-3" />
                 </Link>
               </CardHeader>
@@ -133,9 +149,9 @@ export default function DashboardPage() {
                   <CardTitle className="text-sm font-bold">Status Surat Masuk</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <Bar label="Belum Diproses" value={belum} total={masuk?.length ?? 0} tone="bg-destructive" />
-                  <Bar label="Dalam Proses" value={proses} total={masuk?.length ?? 0} tone="bg-warning" />
-                  <Bar label="Selesai" value={c(masuk, (s) => s.status === "Selesai")} total={masuk?.length ?? 0} tone="bg-success" />
+                  <Bar label="Belum Diproses" value={belum} total={totalMasuk} tone="bg-destructive" />
+                  <Bar label="Dalam Proses" value={proses} total={totalMasuk} tone="bg-warning" />
+                  <Bar label="Selesai" value={selesai} total={totalMasuk} tone="bg-success" />
                 </CardContent>
               </Card>
 
@@ -144,13 +160,13 @@ export default function DashboardPage() {
                   <CardTitle className="text-sm font-bold">Status Surat Keluar</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <Bar label="Draft" value={draft} total={keluar?.length ?? 0} tone="bg-warning" />
-                  <Bar label="Dikirim" value={c(keluar, (s) => s.status === "Dikirim")} total={keluar?.length ?? 0} tone="bg-success" />
-                  <Bar label="Arsip" value={c(keluar, (s) => s.status === "Arsip")} total={keluar?.length ?? 0} tone="bg-muted-foreground/40" />
+                  <Bar label="Draft" value={draft} total={totalKeluar} tone="bg-warning" />
+                  <Bar label="Dikirim" value={dikirim} total={totalKeluar} tone="bg-success" />
+                  <Bar label="Arsip" value={arsip} total={totalKeluar} tone="bg-muted-foreground/40" />
                 </CardContent>
               </Card>
 
-              <Link href="/input">
+              <Link href="/surat-masuk">
                 <Card className="flex items-center gap-3 p-4 transition hover:border-primary/40 hover:shadow-md">
                   <div className="grid size-10 place-items-center rounded-lg bg-primary text-primary-foreground">
                     <MailPlusIcon className="size-5" />

@@ -41,15 +41,31 @@ export async function GET(request: NextRequest) {
       where.push(`(${cfg.searchCols.map((c) => `${c} ILIKE $${params.length}`).join(" OR ")})`)
     }
 
-    const result = await pool.query(
-      `SELECT ${cfg.columns}
-       FROM ${cfg.table}
-       ${where.length ? `WHERE ${where.join(" AND ")}` : ""}
-       ORDER BY (${cfg.dateOrder}::date) DESC NULLS LAST, id DESC
-       LIMIT 500`,
-      params,
-    )
-    return NextResponse.json({ jenis, surat: result.rows })
+    // Statistik tanpa filter (dipakai kartu), hasil tabel dengan filter + pagination.
+    const page = Math.max(1, parseInt(sp.get("page") || "1", 10) || 1)
+    const perPage = Math.min(100, Math.max(5, parseInt(sp.get("per_page") || "15", 10) || 15))
+    const whereSql = where.length ? `WHERE ${where.join(" AND ")}` : ""
+
+    const [statRows, sifatRows, countRes, result] = await Promise.all([
+      pool.query(`SELECT status, COUNT(*)::int AS n FROM ${cfg.table} GROUP BY status`),
+      pool.query(`SELECT sifat, COUNT(*)::int AS n FROM ${cfg.table} GROUP BY sifat`),
+      pool.query(`SELECT COUNT(*)::int AS count FROM ${cfg.table} ${whereSql}`, params),
+      pool.query(
+        `SELECT ${cfg.columns}
+         FROM ${cfg.table}
+         ${whereSql}
+         ORDER BY (${cfg.dateOrder}::date) DESC NULLS LAST, id DESC
+         LIMIT ${perPage} OFFSET ${(page - 1) * perPage}`,
+        params,
+      ),
+    ])
+    const stats: Record<string, number> = { total: 0 }
+    for (const r of statRows.rows) {
+      stats[r.status] = r.n
+      stats.total += r.n
+    }
+    for (const r of sifatRows.rows) stats[`sifat:${r.sifat}`] = r.n
+    return NextResponse.json({ jenis, surat: result.rows, total: countRes.rows[0]?.count ?? 0, page, per_page: perPage, stats })
   } catch (error) {
     console.error("GET /api/surat:", error)
     return NextResponse.json({ error: "Gagal memuat data surat" }, { status: 500 })
