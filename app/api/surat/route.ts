@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
 
     // Statistik tanpa filter (dipakai kartu), hasil tabel dengan filter + pagination.
     const page = Math.max(1, parseInt(sp.get("page") || "1", 10) || 1)
-    const perPage = Math.min(100, Math.max(5, parseInt(sp.get("per_page") || "15", 10) || 15))
+    const perPage = Math.min(100, Math.max(1, parseInt(sp.get("per_page") || "15", 10) || 15))
     const whereSql = where.length ? `WHERE ${where.join(" AND ")}` : ""
 
     const [statRows, sifatRows, countRes, result] = await Promise.all([
