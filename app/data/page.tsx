@@ -190,7 +190,7 @@ export default function DataSuratPage() {
               {(["masuk", "keluar"] as const).map((j) => {
                 const Icon = j === "masuk" ? InboxIcon : SendIcon
                 return (
-                  <TabsTrigger key={j} value={j} className="px-4 font-semibold">
+                  <TabsTrigger key={j} value={j} className="px-4 font-semibold data-active:bg-primary data-active:text-primary-foreground data-active:hover:text-primary-foreground">
                     <Icon />
                     Surat {j === "masuk" ? "Masuk" : "Keluar"}
                   </TabsTrigger>
@@ -227,7 +227,7 @@ export default function DataSuratPage() {
           className="flex-wrap"
         >
           {STATUS_FILTER[jenis].map((s) => (
-            <ToggleGroupItem key={s} value={s} className="gap-1.5 rounded-full px-3 text-xs font-semibold">
+            <ToggleGroupItem key={s} value={s} className="gap-1.5 rounded-full px-3 text-xs font-semibold data-[state=on]:border-primary data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">
               {s}
               {rows !== null && counts[s] !== undefined ? (
                 <Badge variant={status === s ? "secondary" : "outline"} className="h-4 px-1.5 font-mono text-[10px] tabular-nums">

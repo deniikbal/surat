@@ -103,7 +103,7 @@ export default function InputSuratPage() {
           {(["masuk", "keluar"] as const).map((j) => {
             const Icon = j === "masuk" ? InboxIcon : SendIcon
             return (
-              <ToggleGroupItem key={j} value={j} className="flex-1 py-2 text-sm font-semibold">
+              <ToggleGroupItem key={j} value={j} className="flex-1 py-2 text-sm font-semibold data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">
                 <Icon />
                 Surat {j === "masuk" ? "Masuk" : "Keluar"}
               </ToggleGroupItem>
