@@ -57,36 +57,36 @@ export default function LoginPage() {
   return (
     <main className="flex min-h-svh">
       {/* Panel kiri (desktop) */}
-      <div className="relative hidden w-1/2 flex-col justify-between bg-primary p-10 lg:flex">
+      <div className="relative hidden w-1/2 flex-col justify-between bg-primary p-10 text-primary-foreground lg:flex">
         <div className="flex items-center gap-2.5">
           <div className="grid size-9 place-items-center rounded-lg bg-white/15">
-            <FileTextIcon className="size-5 text-white" />
+            <FileTextIcon className="size-5 text-foreground" />
           </div>
           <div>
-            <p className="text-sm font-bold text-white">Persuratan</p>
-            <p className="text-[11px] text-white/60">SMAN 1 Bantarujeg</p>
+            <p className="text-sm font-bold text-foreground">Persuratan</p>
+            <p className="text-[11px] text-foreground/60">SMAN 1 Bantarujeg</p>
           </div>
         </div>
 
         <div className="max-w-sm">
-          <h2 className="text-2xl font-bold leading-snug text-white">
+          <h2 className="text-2xl font-bold leading-snug text-foreground">
             Kelola agenda surat masuk &amp; keluar dalam satu tempat.
           </h2>
-          <ul className="mt-6 space-y-3 text-sm text-white/75">
+          <ul className="mt-6 space-y-3 text-sm text-foreground/70">
             {[
               "Nomor agenda otomatis (SM-001, SK-001, ...)",
               "Register bisa dicari & difilter per status",
               "Dashboard ringkas: surat perlu diproses, sifat penting",
             ].map((t) => (
               <li key={t} className="flex items-start gap-2.5">
-                <CheckIcon className="mt-0.5 size-4 shrink-0 text-white/50" />
+                <CheckIcon className="mt-0.5 size-4 shrink-0 text-foreground/50" />
                 {t}
               </li>
             ))}
           </ul>
         </div>
 
-        <p className="text-[11px] text-white/40">Sistem Informasi Persuratan Sekolah</p>
+        <p className="text-[11px] text-foreground/40">Sistem Informasi Persuratan Sekolah</p>
       </div>
 
       {/* Form */}
