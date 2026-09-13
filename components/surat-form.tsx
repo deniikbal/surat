@@ -171,7 +171,7 @@ export function SuratFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={(o) => !saving && onOpenChange(o)}>
-      <DialogContent className="max-w-2xl sm:max-w-[calc(100%-2rem)]">
+      <DialogContent className="max-h-[calc(100svh-2rem)] gap-0 overflow-y-auto sm:max-w-2xl">
         <DialogHeader className="text-left">
           <DialogTitle className="text-sm font-bold">
             {isEdit ? `Ubah Surat ${isMasuk ? "Masuk" : "Keluar"}` : `Catat Surat ${isMasuk ? "Masuk" : "Keluar"}`}
