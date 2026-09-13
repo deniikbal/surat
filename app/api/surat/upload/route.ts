@@ -78,6 +78,16 @@ export async function DELETE(request: NextRequest) {
   }
   const fileId = request.nextUrl.searchParams.get("fileId")?.trim()
   if (!fileId) return NextResponse.json({ error: "fileId wajib" }, { status: 400 })
+  // fileId dipercaya hanya jika dipakai di DB — file yatim (gagal simpan) dibersihkan manual.
+  const { JENIS } = await import("@/lib/server/surat")
+  const dipakai = await Promise.all(
+    Object.values(JENIS).map((cfg) =>
+      pool.query(`SELECT 1 FROM ${cfg.table} WHERE file_id = $1 LIMIT 1`, [fileId]),
+    ),
+  )
+  if (dipakai.some((r) => r.rows.length > 0)) {
+    return NextResponse.json({ error: "Berkas sedang dipakai surat" }, { status: 400 })
+  }
   try {
     await deleteLampiran(fileId)
     return NextResponse.json({ ok: true })

@@ -41,6 +41,15 @@ export async function ensureSuratTables() {
       updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
     )
   `)
+  // Index: order tanggal + filter status + pencarian ILIKE.
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_surat_masuk_terima ON surat_masuk (tgl_terima DESC, id DESC);
+    CREATE INDEX IF NOT EXISTS idx_surat_keluar_surat ON surat_keluar (tgl_surat DESC, id DESC);
+    CREATE INDEX IF NOT EXISTS idx_surat_masuk_status ON surat_masuk (status);
+    CREATE INDEX IF NOT EXISTS idx_surat_keluar_status ON surat_keluar (status);
+    CREATE INDEX IF NOT EXISTS idx_surat_masuk_no_agenda ON surat_masuk (no_agenda);
+    CREATE INDEX IF NOT EXISTS idx_surat_keluar_no_agenda ON surat_keluar (no_agenda);
+  `)
   // Tabel yang sudah ada sebelum fitur lampiran.
   await pool.query(`
     ALTER TABLE surat_masuk ADD COLUMN IF NOT EXISTS file_id TEXT;
