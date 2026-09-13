@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getSessionCookie } from "better-auth/cookies"
 
+const PUBLIK = ["/", "/login"]
+
 export default async function proxy(request: NextRequest) {
+  if (PUBLIK.includes(request.nextUrl.pathname)) return NextResponse.next()
+
   const sessionCookie = getSessionCookie(request)
 
   if (!sessionCookie) {
