@@ -16,6 +16,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -98,10 +99,12 @@ export function Shell({ children }: { children: React.ReactNode }) {
                 <ChevronDownIcon className="hidden size-3.5 text-white/60 sm:block" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" side="bottom" sideOffset={8} className="min-w-56">
-                <DropdownMenuLabel className="leading-tight">
-                  <span className="block text-xs font-semibold">{user?.name || "Petugas"}</span>
-                  <span className="block truncate text-[11px] font-normal text-muted-foreground">{user?.email}</span>
-                </DropdownMenuLabel>
+                <DropdownMenuGroup>
+                  <DropdownMenuLabel className="leading-tight">
+                    <span className="block text-xs font-semibold">{user?.name || "Petugas"}</span>
+                    <span className="block truncate text-[11px] font-normal text-muted-foreground">{user?.email}</span>
+                  </DropdownMenuLabel>
+                </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem variant="destructive" onClick={logout}>
                   <LogOutIcon />
