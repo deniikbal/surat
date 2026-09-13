@@ -30,7 +30,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   Dialog,
   DialogContent,
@@ -57,6 +57,7 @@ import {
 } from "@/components/ui/table"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { isAdmin, useSession } from "@/lib/auth-client"
+import { cn } from "@/lib/utils"
 
 type UserRow = {
   id: string
@@ -112,6 +113,12 @@ export default function UsersPage() {
   useEffect(() => {
     if (admin) load()
   }, [admin, load])
+
+  const statCards = [
+    { label: "Total User", value: rows?.length ?? 0, icon: UsersIcon, tone: "bg-primary/10 text-primary" },
+    { label: "Admin", value: (rows ?? []).filter((u) => u.role === "admin").length, icon: ShieldCheckIcon, tone: "bg-info/10 text-info" },
+    { label: "User", value: (rows ?? []).filter((u) => (u.role ?? "user") === "user").length, icon: UserIcon, tone: "bg-success/10 text-success" },
+  ]
 
   async function confirmDelete() {
     if (!del) return
@@ -184,6 +191,19 @@ export default function UsersPage() {
             <AlertDescription>{msg.text}</AlertDescription>
           </Alert>
         ) : null}
+
+        {/* Kartu statistik peran */}
+        <div className="grid grid-cols-3 gap-3">
+          {statCards.map((c) => (
+            <Card key={c.label} className="p-4">
+              <div className={cn("mb-2 grid size-8 place-items-center rounded-lg", c.tone)}>
+                <c.icon className="size-4" />
+              </div>
+              <p className="font-mono text-2xl font-bold tabular-nums">{c.value}</p>
+              <p className="text-xs text-muted-foreground">{c.label}</p>
+            </Card>
+          ))}
+        </div>
 
         <Card className="overflow-hidden py-0">
           {rows === null ? (
