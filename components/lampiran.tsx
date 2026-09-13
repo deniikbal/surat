@@ -115,7 +115,7 @@ export function LampiranField({
           )}
         >
           {busy ? <Spinner /> : <PaperclipIcon className="size-4" />}
-          {busy ? "Mengunggah ke Drive..." : "Pilih berkas (maks. 15 MB)"}
+          {busy ? "Mengunggah ke Drive..." : "Pilih berkas (maks. 2 MB)"}
         </button>
       )}
       {err ? <p className="mt-1.5 text-xs font-medium text-destructive">{err}</p> : null}

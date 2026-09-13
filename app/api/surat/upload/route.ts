@@ -4,7 +4,7 @@ import { pool } from "@/lib/db"
 import { ensureSuratTables, JENIS, type JenisKey } from "@/lib/server/surat"
 import { deleteLampiran, uploadLampiran } from "@/lib/server/drive"
 
-const MAX_BYTES = 15 * 1024 * 1024
+const MAX_BYTES = 2 * 1024 * 1024
 const ALLOWED = [
   "application/pdf",
   "image/jpeg",
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "File belum dipilih" }, { status: 400 })
     }
     if (file.size > MAX_BYTES) {
-      return NextResponse.json({ error: "Ukuran file maksimal 15 MB" }, { status: 400 })
+      return NextResponse.json({ error: "Ukuran file maksimal 2 MB" }, { status: 400 })
     }
     if (file.type && !ALLOWED.includes(file.type)) {
       return NextResponse.json({ error: "Format harus PDF, gambar, atau Word" }, { status: 400 })
