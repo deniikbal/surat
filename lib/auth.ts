@@ -1,4 +1,5 @@
 import { betterAuth } from "better-auth"
+import { admin } from "better-auth/plugins"
 import {Pool} from "pg"
 
 // better-auth bisa menerima pg.Pool langsung → tabel user/session/account/
@@ -23,7 +24,18 @@ export const auth = betterAuth({
     // nginx (127.0.0.1) + Cloudflare di depan app → IP klien dari header proxy
     ipAddress: { ipAddressHeaders: ["cf-connecting-ip", "x-forwarded-for"] },
   },
+  plugins: [
+    admin({
+      defaultRole: "user",
+      adminPreferences: { apiKey: false, backupCode: false },
+    }),
+  ],
 })
+
+/** Helper: user dengan peran admin (lihat menu Users + akses /api/users). */
+export function isAdmin(user: { role?: string | null } | null | undefined) {
+  return user?.role === "admin"
+}
 
 export type Session = typeof auth.$Infer.Session.session
 export type User = typeof auth.$Infer.Session.user

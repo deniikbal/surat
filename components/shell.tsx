@@ -8,18 +8,20 @@ import {
   LayoutDashboardIcon,
   LogOutIcon,
   SendIcon,
+  UsersIcon,
 } from "lucide-react"
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { signOut, useSession } from "@/lib/auth-client"
+import { isAdmin, signOut, useSession } from "@/lib/auth-client"
 import { cn } from "@/lib/utils"
 
 const MENU = [
   { href: "/", label: "Dashboard", icon: LayoutDashboardIcon },
   { href: "/surat-masuk", label: "Surat Masuk", icon: InboxIcon },
   { href: "/surat-keluar", label: "Surat Keluar", icon: SendIcon },
+  { href: "/users", label: "Users", icon: UsersIcon, adminOnly: true },
 ]
 
 export function Shell({ children }: { children: React.ReactNode }) {
@@ -54,7 +56,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
           {/* Menu */}
           <nav className="ml-1 flex items-center gap-1 overflow-x-auto md:ml-6">
-            {MENU.map((m) => {
+            {MENU.filter((m) => !m.adminOnly || isAdmin(user)).map((m) => {
               const active = pathname === m.href
               const Icon = m.icon
               return (
