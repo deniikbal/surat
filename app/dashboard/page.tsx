@@ -200,16 +200,16 @@ function Stat({
   }[tone]
   return (
     <Link href={href}>
-      <Card className="group p-4 transition hover:shadow-md">
-        <div className="flex items-center justify-between">
-          <div className={`grid size-9 place-items-center rounded-lg ${toneCls}`}>
-            <Icon className="size-4" />
-          </div>
-          <ArrowUpRightIcon className="size-3.5 text-muted-foreground opacity-0 transition group-hover:opacity-100" />
+      <Card className="group flex items-center gap-3 p-3 transition hover:shadow-md">
+        <div className={`grid size-8 shrink-0 place-items-center rounded-lg ${toneCls}`}>
+          <Icon className="size-4" />
         </div>
-        <p className="mt-3 font-mono text-3xl font-bold tabular-nums">{value}</p>
-        <p className="text-sm font-medium">{label}</p>
-        <p className="mt-0.5 text-[11px] text-muted-foreground">{note}</p>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-xs font-medium text-muted-foreground">{label}</p>
+          <p className="font-mono text-xl font-bold leading-tight tabular-nums">{value}</p>
+          <p className="truncate text-[11px] text-muted-foreground/80">{note}</p>
+        </div>
+        <ArrowUpRightIcon className="size-3.5 shrink-0 text-muted-foreground opacity-0 transition group-hover:opacity-100" />
       </Card>
     </Link>
   )
