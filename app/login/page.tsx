@@ -58,8 +58,8 @@ export default function LoginPage() {
 
   return (
     <main className="grid min-h-svh lg:grid-cols-2">
-      {/* Form (kiri) */}
-      <div className="flex flex-col px-6 py-8 sm:px-10 lg:px-14">
+      {/* Form (kanan) */}
+      <div className="flex flex-col px-6 py-8 sm:px-10 lg:order-2 lg:px-14">
         <Link href="/" className="flex w-fit items-center gap-2 text-xs font-medium text-muted-foreground transition hover:text-foreground">
           <ArrowLeftIcon className="size-3.5" /> Kembali ke halaman depan
         </Link>
@@ -133,8 +133,8 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Hero (kanan) — hanya desktop */}
-      <div className="relative hidden flex-col justify-between overflow-hidden bg-primary p-12 text-primary-foreground lg:flex">
+      {/* Hero (kiri) — hanya desktop */}
+      <div className="relative hidden flex-col justify-between overflow-hidden bg-primary p-12 text-primary-foreground lg:order-1 lg:flex">
         <div className="flex items-center gap-2.5">
           <BrandLogo className="size-9 rounded-lg" />
           <div>
