@@ -65,7 +65,11 @@ export async function GET(request: NextRequest) {
       stats.total += r.n
     }
     for (const r of sifatRows.rows) stats[`sifat:${r.sifat}`] = r.n
-    return NextResponse.json({ jenis, surat: result.rows, total: countRes.rows[0]?.count ?? 0, page, per_page: perPage, stats })
+    const monthCol = jenis === "keluar" ? "tgl_surat" : "tgl_terima"
+    const monthRes = await pool.query(
+      `SELECT COUNT(*)::int AS c FROM ${cfg.table} WHERE ${monthCol} >= date_trunc('month', CURRENT_DATE) AND ${monthCol} < date_trunc('month', CURRENT_DATE) + interval '1 month'`
+    )
+    return NextResponse.json({ jenis, surat: result.rows, total: countRes.rows[0]?.count ?? 0, page, per_page: perPage, stats, month_count: monthRes.rows[0]?.c ?? 0, sifat_counts: Object.fromEntries(Object.entries(stats).filter(([k]) => k.startsWith("sifat:")).map(([k, v]) => [k.slice(6), v])) })
   } catch (error) {
     console.error("GET /api/surat:", error)
     return NextResponse.json({ error: "Gagal memuat data surat" }, { status: 500 })

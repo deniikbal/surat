@@ -4,12 +4,14 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import {
   ArrowUpRightIcon,
+  CheckCircle2Icon,
   ClockIcon,
   InboxIcon,
   MailMinusIcon,
   MailPlusIcon,
   SendIcon,
   TimerIcon,
+  TrendingUpIcon,
 } from "lucide-react"
 
 import { Shell } from "@/components/shell"
@@ -37,6 +39,7 @@ export default function DashboardPage() {
 
   const [statsMasuk, setStatsMasuk] = useState<Record<string, number>>({})
   const [statsKeluar, setStatsKeluar] = useState<Record<string, number>>({})
+  const [bulan, setBulan] = useState<Record<string, number>>({})
 
   useEffect(() => {
     fetch("/api/surat?per_page=6")
@@ -44,6 +47,7 @@ export default function DashboardPage() {
       .then((d) => {
         setMasuk(Array.isArray(d.surat) ? d.surat : [])
         setStatsMasuk(d.stats ?? {})
+        setBulan((b) => ({ ...b, masuk: d.month_count ?? 0 }))
       })
       .catch(() => setMasuk([]))
     fetch("/api/surat?jenis=keluar&per_page=6")
@@ -51,11 +55,12 @@ export default function DashboardPage() {
       .then((d) => {
         setKeluar(Array.isArray(d.surat) ? d.surat : [])
         setStatsKeluar(d.stats ?? {})
+        setBulan((b) => ({ ...b, keluar: d.month_count ?? 0 }))
       })
       .catch(() => setKeluar([]))
   }, [])
 
-  // statistik dari API (tidak terpengaruh pagination); baris hanya utk timeline
+  // statistik dari API (tidak terpengaruh pagination)
   const belum = statsMasuk["Belum Diproses"] ?? 0
   const proses = statsMasuk["Dalam Proses"] ?? 0
   const selesai = statsMasuk["Selesai"] ?? 0
@@ -67,8 +72,9 @@ export default function DashboardPage() {
   const urgent =
     (statsMasuk["sifat:Penting"] ?? 0) + (statsMasuk["sifat:Segera"] ?? 0) +
     (statsKeluar["sifat:Penting"] ?? 0) + (statsKeluar["sifat:Segera"] ?? 0)
+  const masukBulan = bulan.masuk ?? 0
+  const keluarBulan = bulan.keluar ?? 0
 
-  // gabungan terbaru masuk+keluar utk timeline
   const recent: Array<Surat & { _jenis: "masuk" | "keluar" }> = [
     ...(masuk ?? []).map((s) => ({ ...s, _jenis: "masuk" as const })),
     ...(keluar ?? []).map((s) => ({ ...s, _jenis: "keluar" as const })),
@@ -86,16 +92,49 @@ export default function DashboardPage() {
         </div>
       ) : (
         <div className="space-y-5">
-          {/* Kartu statistik */}
-          <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-            <Stat icon={MailMinusIcon} label="Surat Masuk" value={totalMasuk} note="Total tercatat" href="/surat-masuk" tone="primary" />
-            <Stat icon={MailPlusIcon} label="Surat Keluar" value={totalKeluar} note="Total tercatat" href="/surat-keluar" tone="info" />
-            <Stat icon={TimerIcon} label="Perlu Diproses" value={belum + proses + draft} note={`${belum} masuk · ${proses} proses · ${draft} draft`} href="/surat-masuk" tone="warning" />
-            <Stat icon={SendIcon} label="Sifat Penting/Segera" value={urgent} note="Perlu perhatian" href="/surat-masuk" tone="destructive" />
+          {/* Baris 1 — ringkasan utama */}
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+            <Stat
+              icon={MailMinusIcon}
+              label="Surat Masuk"
+              value={totalMasuk}
+              sub={`${masukBulan} bulan ini`}
+              trend={`${belum} perlu diproses`}
+              subPct={totalMasuk ? Math.round((belum / totalMasuk) * 100) : 0}
+              href="/surat-masuk"
+              tone="primary"
+            />
+            <Stat
+              icon={MailPlusIcon}
+              label="Surat Keluar"
+              value={totalKeluar}
+              sub={`${keluarBulan} bulan ini`}
+              trend={`${draft} masih draft`}
+              subPct={totalKeluar ? Math.round((draft / totalKeluar) * 100) : 0}
+              href="/surat-keluar"
+              tone="info"
+            />
+            <Stat
+              icon={TimerIcon}
+              label="Belum Tuntas"
+              value={belum + proses + draft}
+              sub={`${belum} masuk · ${proses} proses · ${draft} draft`}
+              trend={`${Math.round(((belum + proses + draft) / Math.max(totalMasuk + totalKeluar, 1)) * 100)}% total`}
+              href="/surat-masuk"
+              tone="warning"
+            />
+            <Stat
+              icon={SendIcon}
+              label="Sifat Penting/Segera"
+              value={urgent}
+              sub="Butuh perhatian lebih"
+              trend={`${totalMasuk + totalKeluar > 0 ? Math.round((urgent / (totalMasuk + totalKeluar)) * 100) : 0}% dari total`}
+              href="/surat-masuk"
+              tone="destructive"
+            />
           </div>
 
           <div className="grid gap-5 xl:grid-cols-[1.4fr_1fr]">
-            {/* Timeline terbaru */}
             <Card>
               <CardHeader className="flex-row items-center justify-between">
                 <CardTitle className="text-sm font-bold">Aktivitas Surat Terbaru</CardTitle>
@@ -107,9 +146,7 @@ export default function DashboardPage() {
                 {recent.length === 0 ? (
                   <Empty className="border-0 py-8">
                     <EmptyHeader>
-                      <EmptyMedia variant="icon">
-                        <InboxIcon />
-                      </EmptyMedia>
+                      <EmptyMedia variant="icon"><InboxIcon /></EmptyMedia>
                       <EmptyTitle>Belum ada surat tercatat</EmptyTitle>
                       <EmptyDescription>Mulai dari menu Input Surat.</EmptyDescription>
                     </EmptyHeader>
@@ -142,11 +179,13 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
 
-            {/* Kolom kanan */}
             <div className="space-y-5">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-sm font-bold">Status Surat Masuk</CardTitle>
+                  <CardTitle className="flex items-center justify-between text-sm font-bold">
+                    <span>Status Surat Masuk</span>
+                    <span className="font-mono text-xs text-muted-foreground">{totalMasuk} total</span>
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <Bar label="Belum Diproses" value={belum} total={totalMasuk} tone="bg-destructive" />
@@ -157,12 +196,34 @@ export default function DashboardPage() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-sm font-bold">Status Surat Keluar</CardTitle>
+                  <CardTitle className="flex items-center justify-between text-sm font-bold">
+                    <span>Status Surat Keluar</span>
+                    <span className="font-mono text-xs text-muted-foreground">{totalKeluar} total</span>
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <Bar label="Draft" value={draft} total={totalKeluar} tone="bg-warning" />
                   <Bar label="Dikirim" value={dikirim} total={totalKeluar} tone="bg-success" />
                   <Bar label="Arsip" value={arsip} total={totalKeluar} tone="bg-muted-foreground/40" />
+                </CardContent>
+              </Card>
+
+              <Card className="bg-primary/5">
+                <CardContent className="flex items-center gap-3 p-4">
+                  <div className="grid size-10 place-items-center rounded-lg bg-primary text-primary-foreground">
+                    <CheckCircle2Icon className="size-5" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold">Tingkat penyelesaian</p>
+                    <p className="text-xs text-muted-foreground">
+                      {totalMasuk ? Math.round((selesai / totalMasuk) * 100) : 0}% surat masuk sudah selesai
+                    </p>
+                    <Progress value={totalMasuk ? (selesai / totalMasuk) * 100 : 0} className="mt-1.5 gap-0">
+                      <ProgressTrack className="h-1.5">
+                        <ProgressIndicator className="bg-success" />
+                      </ProgressTrack>
+                    </Progress>
+                  </div>
                 </CardContent>
               </Card>
 
@@ -187,9 +248,10 @@ export default function DashboardPage() {
 }
 
 function Stat({
-  icon: Icon, label, value, note, href, tone,
+  icon: Icon, label, value, sub, trend, subPct, href, tone,
 }: {
-  icon: typeof InboxIcon; label: string; value: number; note: string; href: string;
+  icon: typeof InboxIcon; label: string; value: number;
+  sub: string; trend: string; subPct?: number; href: string;
   tone: "primary" | "info" | "warning" | "destructive"
 }) {
   const toneCls = {
@@ -200,16 +262,28 @@ function Stat({
   }[tone]
   return (
     <Link href={href}>
-      <Card className="group flex items-center gap-3 p-3 transition hover:shadow-md">
-        <div className={`grid size-8 shrink-0 place-items-center rounded-lg ${toneCls}`}>
-          <Icon className="size-4" />
+      <Card className="group relative overflow-hidden p-4 transition hover:shadow-md">
+        <div className="flex items-start justify-between">
+          <div className={`grid size-9 place-items-center rounded-lg ${toneCls}`}>
+            <Icon className="size-4" />
+          </div>
+          <ArrowUpRightIcon className="size-3.5 text-muted-foreground opacity-0 transition group-hover:opacity-100" />
         </div>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-xs font-medium text-muted-foreground">{label}</p>
-          <p className="font-mono text-xl font-bold leading-tight tabular-nums">{value}</p>
-          <p className="truncate text-[11px] text-muted-foreground/80">{note}</p>
-        </div>
-        <ArrowUpRightIcon className="size-3.5 shrink-0 text-muted-foreground opacity-0 transition group-hover:opacity-100" />
+        <p className="mt-3 font-mono text-2xl font-bold leading-none tabular-nums">{value}</p>
+        <p className="mt-1 text-sm font-medium">{label}</p>
+        <p className="mt-2 flex items-center gap-1 text-[11px] font-medium text-muted-foreground">
+          <TrendingUpIcon className="size-3" />
+          {sub}
+        </p>
+        <p className="mt-1 text-[11px] text-muted-foreground/80">{trend}</p>
+        {typeof subPct === "number" ? (
+          <div className="absolute inset-x-0 bottom-0 h-1 bg-muted">
+            <div
+              className={`h-full ${tone === "primary" ? "bg-primary" : tone === "info" ? "bg-info" : tone === "warning" ? "bg-warning" : "bg-destructive"}`}
+              style={{ width: `${Math.min(100, Math.max(0, subPct))}%` }}
+            />
+          </div>
+        ) : null}
       </Card>
     </Link>
   )

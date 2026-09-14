@@ -37,6 +37,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group"
+import { ExportPdfButton } from "@/components/export-pdf-button"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   Table,
@@ -208,21 +209,24 @@ export function SuratHalaman({ jenis }: { jenis: Jenis }) {
             ))}
           </ToggleGroup>
 
-          <InputGroup className="w-full md:max-w-xs">
-            <InputGroupAddon><SearchIcon /></InputGroupAddon>
-            <InputGroupInput
-              value={q}
-              onChange={(e) => resetFilter(() => setQ(e.target.value))}
-              placeholder={isMasuk ? "Cari nomor, pengirim, perihal..." : "Cari nomor, tujuan, perihal..."}
-            />
-            {q ? (
-              <InputGroupAddon align="inline-end">
-                <InputGroupButton size="icon-xs" variant="ghost" onClick={() => resetFilter(() => setQ(""))} title="Bersihkan pencarian">
-                  <XIcon />
-                </InputGroupButton>
-              </InputGroupAddon>
-            ) : null}
-          </InputGroup>
+          <div className="flex items-center gap-2">
+            <ExportPdfButton jenis={jenis} status={status} q={q} rows={rows} />
+            <InputGroup className="w-full md:max-w-xs">
+              <InputGroupAddon><SearchIcon /></InputGroupAddon>
+              <InputGroupInput
+                value={q}
+                onChange={(e) => resetFilter(() => setQ(e.target.value))}
+                placeholder={isMasuk ? "Cari nomor, pengirim, perihal..." : "Cari nomor, tujuan, perihal..."}
+              />
+              {q ? (
+                <InputGroupAddon align="inline-end">
+                  <InputGroupButton size="icon-xs" variant="ghost" onClick={() => resetFilter(() => setQ(""))} title="Bersihkan pencarian">
+                    <XIcon />
+                  </InputGroupButton>
+                </InputGroupAddon>
+              ) : null}
+            </InputGroup>
+          </div>
         </div>
 
         {msg ? (
