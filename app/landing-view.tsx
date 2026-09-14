@@ -11,6 +11,7 @@ import {
   SparklesIcon,
 } from "lucide-react"
 
+import { BrandLogo } from "@/components/brand-logo"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
@@ -44,9 +45,7 @@ export default function LandingPage() {
       {/* Navbar */}
       <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-6xl items-center px-4 md:px-6">
-          <span className="grid size-8 place-items-center rounded-lg bg-primary text-primary-foreground">
-            <FileTextIcon className="size-4" />
-          </span>
+          <BrandLogo className="size-8 rounded-lg" />
           <div className="ml-2.5 leading-tight">
             <span className="block text-sm font-bold">Persuratan</span>
             <span className="block text-[10px] text-muted-foreground">SMAN 1 Bantarujeg</span>

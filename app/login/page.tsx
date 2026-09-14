@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { AlertCircleIcon, ArrowLeftIcon, ArrowRightIcon, CheckIcon, FileTextIcon } from "lucide-react"
+import { AlertCircleIcon, ArrowLeftIcon, ArrowRightIcon, CheckIcon } from "lucide-react"
 
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { BrandLogo } from "@/components/brand-logo"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -66,9 +67,7 @@ export default function LoginPage() {
         <div className="flex flex-1 items-center justify-center py-10">
           <form onSubmit={submit} className="w-full max-w-sm space-y-4">
             <div className="space-y-1.5">
-              <div className="grid size-11 place-items-center rounded-xl bg-primary/10 text-primary">
-                <FileTextIcon className="size-5" />
-              </div>
+              <BrandLogo className="size-11 rounded-xl" />
               <h1 className="pt-2 text-xl font-bold tracking-tight">
                 {checking ? "Memuat..." : needsSetup ? "Buat Akun Administrator" : "Selamat datang kembali"}
               </h1>
@@ -137,9 +136,7 @@ export default function LoginPage() {
       {/* Hero (kanan) — hanya desktop */}
       <div className="relative hidden flex-col justify-between overflow-hidden bg-primary p-12 text-primary-foreground lg:flex">
         <div className="flex items-center gap-2.5">
-          <div className="grid size-9 place-items-center rounded-lg bg-black/10">
-            <FileTextIcon className="size-5" />
-          </div>
+          <BrandLogo className="size-9 rounded-lg" />
           <div>
             <p className="text-sm font-bold">Persuratan</p>
             <p className="text-[11px] text-foreground/60">SMAN 1 Bantarujeg</p>

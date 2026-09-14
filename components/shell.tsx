@@ -6,13 +6,13 @@ import { usePathname } from "next/navigation"
 import {
   CheckCircle2Icon,
   ChevronDownIcon,
-  FileTextIcon,
   InboxIcon,
   LogOutIcon,
   SendIcon,
   UsersIcon,
 } from "lucide-react"
 
+import { BrandLogo } from "@/components/brand-logo"
 import { SuratFormDialog, type Jenis } from "@/components/surat-form"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
@@ -75,9 +75,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0 z-40 bg-primary text-primary-foreground shadow-md">
         <div className="mx-auto flex h-14 max-w-7xl items-center gap-2 px-4 md:px-6 lg:px-8">
           <Link href="/dashboard" className="flex shrink-0 items-center gap-2">
-            <span className="grid size-8 place-items-center rounded-lg bg-black/10">
-              <FileTextIcon className="size-4" />
-            </span>
+            <BrandLogo className="size-8 rounded-lg" />
             <span className="hidden leading-tight sm:block">
               <span className="block text-sm font-bold">Persuratan</span>
               <span className="block text-[10px] text-foreground/60">SMAN 1 Bantarujeg</span>
