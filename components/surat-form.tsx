@@ -189,8 +189,8 @@ export function SuratFormDialog({
 
         <form onSubmit={submit}>
           {/* grid 6 kolom: 3 kolom = span-2, 2 kolom = span-3, penuh = span-6 */}
-          <div className="grid gap-4 py-2 sm:grid-cols-6">
-            <div className="sm:col-span-3">
+          <div className="grid gap-4 py-2">
+            <div>
               <Label htmlFor={`no_surat-${jenis}`}>Nomor Surat *</Label>
               <Input
                 id={`no_surat-${jenis}`}
@@ -202,12 +202,12 @@ export function SuratFormDialog({
               />
             </div>
             {isMasuk ? (
-              <div className="sm:col-span-3">
+              <div>
                 <Label htmlFor={`tgl_terima-${jenis}`}>Tanggal Diterima</Label>
                 <Input id={`tgl_terima-${jenis}`} type="date" value={form.tgl_terima} onChange={set("tgl_terima")} className="mt-1.5" />
               </div>
             ) : (
-              <div className="sm:col-span-3">
+              <div>
                 <Label>Cara Kirim</Label>
                 <NativeSelect value={form.cara_kirim} onChange={set("cara_kirim")} className="mt-1.5 w-full">
                   {CARA_KIRIM.map((k) => (<option key={k}>{k}</option>))}
@@ -216,17 +216,17 @@ export function SuratFormDialog({
             )}
 
             {/* 1 baris 3 kolom: Tanggal Surat | Sifat | Kode Klasifikasi */}
-            <div className="sm:col-span-2">
+            <div>
               <Label htmlFor={`tgl_surat-${jenis}`}>Tanggal Surat</Label>
               <Input id={`tgl_surat-${jenis}`} type="date" value={form.tgl_surat} onChange={set("tgl_surat")} className="mt-1.5" />
             </div>
-            <div className="sm:col-span-2">
+            <div>
               <Label>Sifat Surat</Label>
               <NativeSelect value={form.sifat} onChange={set("sifat")} className="mt-1.5 w-full">
                 {SIFAT.map((k) => (<option key={k}>{k}</option>))}
               </NativeSelect>
             </div>
-            <div className="sm:col-span-2">
+            <div>
               <Label>Kode Klasifikasi</Label>
               <Select
                 value={form.kode_klasifikasi}
@@ -273,7 +273,7 @@ export function SuratFormDialog({
               </Select>
             </div>
 
-            <div className="sm:col-span-6">
+            <div>
               <Label htmlFor={`pihak-${jenis}`}>{isMasuk ? "Pengirim / Instansi Asal" : "Tujuan / Alamat Yang Dituju"}</Label>
               <Input
                 id={`pihak-${jenis}`}
@@ -284,18 +284,18 @@ export function SuratFormDialog({
               />
             </div>
 
-            <div className="sm:col-span-6">
+            <div>
               <Label htmlFor={`perihal-${jenis}`}>Perihal / Isi Ringkas</Label>
               <Textarea id={`perihal-${jenis}`} value={form.perihal} onChange={set("perihal")} rows={2} className="mt-1.5" placeholder="mis. Undangan rapat koordinasi" />
             </div>
 
             {isMasuk ? (
               <>
-                <div className="sm:col-span-3">
+                <div>
                   <Label htmlFor={`disposisi-${jenis}`}>Tujuan Disposisi</Label>
                   <Input id={`disposisi-${jenis}`} value={form.tujuan_disposisi} onChange={set("tujuan_disposisi")} className="mt-1.5" placeholder="Kepala Sekolah / Wakasek / TU" />
                 </div>
-                <div className="sm:col-span-3">
+                <div>
                   <Label>Status</Label>
                   <NativeSelect value={form.status} onChange={set("status")} className="mt-1.5 w-full">
                     {[...new Set([...STATUS[jenis], form.status])].map((k) => (<option key={k}>{k}</option>))}
@@ -303,7 +303,7 @@ export function SuratFormDialog({
                 </div>
               </>
             ) : (
-              <div className="sm:col-span-3">
+              <div>
                 <Label>Status</Label>
                 <NativeSelect value={form.status} onChange={set("status")} className="mt-1.5 w-full">
                   {[...new Set([...STATUS[jenis], form.status])].map((k) => (<option key={k}>{k}</option>))}
@@ -312,7 +312,7 @@ export function SuratFormDialog({
             )}
 
             {/* Unggah langsung ke Drive (mode edit: dengan id → tautan tersimpan di baris ini). */}
-            <div className="sm:col-span-6">
+            <div>
               <LampiranField
                 value={lampiran}
                 jenis={jenis}
