@@ -19,8 +19,9 @@ import { NativeSelect } from "@/components/ui/native-select"
 import { Separator } from "@/components/ui/separator"
 import { Spinner } from "@/components/ui/spinner"
 import { Textarea } from "@/components/ui/textarea"
+import { klasifikasiFlat } from "@/lib/klasifikasi-arsip"
 
-export const KELASIFIKASI = ["421.2 (SMA)", "421.3 (Kesiswaan)", "800 (Kepegawaian)", "005 (Undangan)"]
+export const KELASIFIKASI = klasifikasiFlat.map((k) => k.kode)
 export const SIFAT = ["Biasa", "Penting", "Segera", "Rahasia"]
 export const CARA_KIRIM = ["Biasa", "Registered", "Paket/Kargo", "Email", "Diantar Langsung"]
 export const STATUS: Record<Jenis, string[]> = {
@@ -74,7 +75,7 @@ function emptyForm(jenis: Jenis): FormState {
     pengirim: "",
     tujuan: "",
     perihal: "",
-    kode_klasifikasi: KELASIFIKASI[0],
+    kode_klasifikasi: isMasuk ? "TU.01.01" : "TU.01.02",
     sifat: SIFAT[0],
     tujuan_disposisi: "",
     cara_kirim: CARA_KIRIM[0],
@@ -90,7 +91,7 @@ function fromSurat(s: Surat, jenis: Jenis): FormState {
     pengirim: s.pengirim ?? "",
     tujuan: s.tujuan ?? "",
     perihal: s.perihal ?? "",
-    kode_klasifikasi: s.kode_klasifikasi ?? KELASIFIKASI[0],
+    kode_klasifikasi: s.kode_klasifikasi ?? (isMasuk ? "TU.01.01" : "TU.01.02"),
     sifat: s.sifat ?? SIFAT[0],
     tujuan_disposisi: s.tujuan_disposisi ?? "",
     cara_kirim: s.cara_kirim ?? CARA_KIRIM[0],
@@ -196,7 +197,7 @@ export function SuratFormDialog({
                 onChange={set("no_surat")}
                 required
                 className="mt-1.5"
-                placeholder={isMasuk ? "mis. 421.2/123/DISDIK" : "mis. 005/SMANSA/IX/2026"}
+                placeholder={isMasuk ? "mis. 001/SMANSA/VIII/2026" : "mis. 002/SMANSA/VIII/2026"}
               />
             </div>
             {isMasuk ? (
@@ -227,7 +228,10 @@ export function SuratFormDialog({
             <div className="sm:col-span-2">
               <Label>Kode Klasifikasi</Label>
               <NativeSelect value={form.kode_klasifikasi} onChange={set("kode_klasifikasi")} className="mt-1.5 w-full">
-                {[...new Set([...KELASIFIKASI, form.kode_klasifikasi].filter(Boolean))].map((k) => (<option key={k}>{k}</option>))}
+                {[...new Set([...klasifikasiFlat.map((k) => k.kode), form.kode_klasifikasi].filter(Boolean))].map((kode) => {
+                  const item = klasifikasiFlat.find((k) => k.kode === kode) ?? { kode, nama: "(kode lama)", label: kode }
+                  return <option key={kode} value={item.kode}>{item.label}</option>
+                })}
               </NativeSelect>
             </div>
 
