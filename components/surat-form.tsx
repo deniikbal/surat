@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { NativeSelect } from "@/components/ui/native-select"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { Spinner } from "@/components/ui/spinner"
 import { Textarea } from "@/components/ui/textarea"
@@ -227,43 +228,49 @@ export function SuratFormDialog({
             </div>
             <div className="sm:col-span-2">
               <Label>Kode Klasifikasi</Label>
-              <select
+              <Select
                 value={form.kode_klasifikasi}
-                onChange={(e) => set("kode_klasifikasi")(e as React.ChangeEvent<HTMLSelectElement>)}
-                className="mt-1.5 w-full rounded-md border bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                onValueChange={(v) => set("kode_klasifikasi")(v as unknown as React.ChangeEvent<HTMLInputElement>)}
+
               >
-                {klasifikasiTree.map((root) => (
-                  <optgroup key={root.kode} label={`${root.kode} — ${root.nama}`}>
-                    {root.children?.length
-                      ? root.children.map((sub) => (
-                          sub.children?.length ? (
-                            <Fragment key={sub.kode}>
-                              {sub.children.map((leaf) => (
-                                <option key={leaf.kode} value={leaf.kode}>
-                                  {`    ${leaf.kode} — ${leaf.nama}`}
-                                </option>
-                              ))}
-                            </Fragment>
-                          ) : (
-                            <option key={sub.kode} value={sub.kode}>
-                              {`  ${sub.kode} — ${sub.nama}`}
-                            </option>
+                <SelectTrigger className="mt-1.5 w-full">
+                  <SelectValue placeholder="Pilih klasifikasi" />
+                </SelectTrigger>
+                <SelectContent>
+                  {klasifikasiTree.map((root) => (
+                    <SelectGroup key={root.kode}>
+                      <SelectLabel>{`${root.kode} — ${root.nama}`}</SelectLabel>
+                      {root.children?.length
+                        ? root.children.map((sub) =>
+                            sub.children?.length ? (
+                              <Fragment key={sub.kode}>
+                                {sub.children.map((leaf) => (
+                                  <SelectItem key={leaf.kode} value={leaf.kode}>
+                                    {`${leaf.kode} — ${leaf.nama}`}
+                                  </SelectItem>
+                                ))}
+                              </Fragment>
+                            ) : (
+                              <SelectItem key={sub.kode} value={sub.kode}>
+                                {`${sub.kode} — ${sub.nama}`}
+                              </SelectItem>
+                            ),
                           )
-                        ))
-                      : (
-                        <option key={root.kode} value={root.kode}>
-                          {`${root.kode} — ${root.nama}`}
-                        </option>
-                      )}
-                  </optgroup>
-                ))}
-                {/* kode lama yang tidak ada di daftar baru */}
-                {form.kode_klasifikasi && !klasifikasiFlat.some((k) => k.kode === form.kode_klasifikasi) ? (
-                  <optgroup label="(kode lama)">
-                    <option value={form.kode_klasifikasi}>{form.kode_klasifikasi}</option>
-                  </optgroup>
-                ) : null}
-              </select>
+                        : (
+                          <SelectItem key={root.kode} value={root.kode}>
+                            {`${root.kode} — ${root.nama}`}
+                          </SelectItem>
+                        )}
+                    </SelectGroup>
+                  ))}
+                  {form.kode_klasifikasi && !klasifikasiFlat.some((k) => k.kode === form.kode_klasifikasi) ? (
+                    <SelectGroup>
+                      <SelectLabel>(kode lama)</SelectLabel>
+                      <SelectItem value={form.kode_klasifikasi}>{form.kode_klasifikasi}</SelectItem>
+                    </SelectGroup>
+                  ) : null}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="sm:col-span-6">
