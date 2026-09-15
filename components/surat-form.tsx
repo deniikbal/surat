@@ -229,7 +229,7 @@ export function SuratFormDialog({
               <Label>Kode Klasifikasi</Label>
               <select
                 value={form.kode_klasifikasi}
-                onChange={(e) => set("kode_klasifikasi")(e.target.value)}
+                onChange={(e) => set("kode_klasifikasi")(e as React.ChangeEvent<HTMLSelectElement>)}
                 className="mt-1.5 w-full rounded-md border bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
               >
                 {klasifikasiTree.map((root) => (
