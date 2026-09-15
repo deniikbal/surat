@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { Fragment, useState } from "react"
 import { CheckIcon } from "lucide-react"
 
 import { LampiranField, type Lampiran } from "@/components/lampiran"
@@ -19,7 +19,7 @@ import { NativeSelect } from "@/components/ui/native-select"
 import { Separator } from "@/components/ui/separator"
 import { Spinner } from "@/components/ui/spinner"
 import { Textarea } from "@/components/ui/textarea"
-import { klasifikasiFlat } from "@/lib/klasifikasi-arsip"
+import { klasifikasiArsip as klasifikasiTree, klasifikasiFlat } from "@/lib/klasifikasi-arsip"
 
 export const KELASIFIKASI = klasifikasiFlat.map((k) => k.kode)
 export const SIFAT = ["Biasa", "Penting", "Segera", "Rahasia"]
@@ -227,12 +227,43 @@ export function SuratFormDialog({
             </div>
             <div className="sm:col-span-2">
               <Label>Kode Klasifikasi</Label>
-              <NativeSelect value={form.kode_klasifikasi} onChange={set("kode_klasifikasi")} className="mt-1.5 w-full">
-                {[...new Set([...klasifikasiFlat.map((k) => k.kode), form.kode_klasifikasi].filter(Boolean))].map((kode) => {
-                  const item = klasifikasiFlat.find((k) => k.kode === kode) ?? { kode, nama: "(kode lama)", label: kode }
-                  return <option key={kode} value={item.kode}>{item.label}</option>
-                })}
-              </NativeSelect>
+              <select
+                value={form.kode_klasifikasi}
+                onChange={(e) => set("kode_klasifikasi")(e.target.value)}
+                className="mt-1.5 w-full rounded-md border bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              >
+                {klasifikasiTree.map((root) => (
+                  <optgroup key={root.kode} label={`${root.kode} — ${root.nama}`}>
+                    {root.children?.length
+                      ? root.children.map((sub) => (
+                          sub.children?.length ? (
+                            <Fragment key={sub.kode}>
+                              {sub.children.map((leaf) => (
+                                <option key={leaf.kode} value={leaf.kode}>
+                                  {`    ${leaf.kode} — ${leaf.nama}`}
+                                </option>
+                              ))}
+                            </Fragment>
+                          ) : (
+                            <option key={sub.kode} value={sub.kode}>
+                              {`  ${sub.kode} — ${sub.nama}`}
+                            </option>
+                          )
+                        ))
+                      : (
+                        <option key={root.kode} value={root.kode}>
+                          {`${root.kode} — ${root.nama}`}
+                        </option>
+                      )}
+                  </optgroup>
+                ))}
+                {/* kode lama yang tidak ada di daftar baru */}
+                {form.kode_klasifikasi && !klasifikasiFlat.some((k) => k.kode === form.kode_klasifikasi) ? (
+                  <optgroup label="(kode lama)">
+                    <option value={form.kode_klasifikasi}>{form.kode_klasifikasi}</option>
+                  </optgroup>
+                ) : null}
+              </select>
             </div>
 
             <div className="sm:col-span-6">
