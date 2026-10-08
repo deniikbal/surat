@@ -230,7 +230,9 @@ export function SuratFormDialog({
               <Label>Kode Klasifikasi</Label>
               <Select
                 value={form.kode_klasifikasi}
-                onValueChange={(v) => set("kode_klasifikasi")(v as unknown as React.ChangeEvent<HTMLInputElement>)}
+                onValueChange={(v) =>
+                  setForm((f) => ({ ...f, kode_klasifikasi: v ?? "" }))
+                }
 
               >
                 <SelectTrigger className="mt-1.5 w-full">
