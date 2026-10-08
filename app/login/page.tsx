@@ -10,6 +10,7 @@ import { BrandLogo } from "@/components/brand-logo"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { PasswordInput } from "@/components/password-input"
 import { Spinner } from "@/components/ui/spinner"
 import { signIn, signUp } from "@/lib/auth-client"
 
@@ -108,11 +109,10 @@ export default function LoginPage() {
             </div>
             <div>
               <Label htmlFor="password">Password</Label>
-              <Input
+              <PasswordInput
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                type="password"
                 required
                 minLength={8}
                 placeholder="Minimal 8 karakter"
