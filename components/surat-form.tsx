@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { NativeSelect } from "@/components/ui/native-select"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { Spinner } from "@/components/ui/spinner"
@@ -209,9 +208,14 @@ export function SuratFormDialog({
             ) : (
               <div className="sm:col-span-3">
                 <Label>Cara Kirim</Label>
-                <NativeSelect value={form.cara_kirim} onChange={set("cara_kirim")} className="mt-1.5 w-full">
-                  {CARA_KIRIM.map((k) => (<option key={k}>{k}</option>))}
-                </NativeSelect>
+                <Select value={form.cara_kirim} onValueChange={(v) => setForm((f) => ({ ...f, cara_kirim: v ?? "" }))}>
+                  <SelectTrigger className="mt-1.5 w-full">
+                    <SelectValue placeholder="Pilih cara kirim" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CARA_KIRIM.map((k) => (<SelectItem key={k} value={k}>{k}</SelectItem>))}
+                  </SelectContent>
+                </Select>
               </div>
             )}
 
@@ -222,9 +226,14 @@ export function SuratFormDialog({
             </div>
             <div className="sm:col-span-2">
               <Label>Sifat Surat</Label>
-              <NativeSelect value={form.sifat} onChange={set("sifat")} className="mt-1.5 w-full">
-                {SIFAT.map((k) => (<option key={k}>{k}</option>))}
-              </NativeSelect>
+              <Select value={form.sifat} onValueChange={(v) => setForm((f) => ({ ...f, sifat: v ?? "" }))}>
+                <SelectTrigger className="mt-1.5 w-full">
+                  <SelectValue placeholder="Pilih sifat" />
+                </SelectTrigger>
+                <SelectContent>
+                  {SIFAT.map((k) => (<SelectItem key={k} value={k}>{k}</SelectItem>))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="sm:col-span-6">
               <Label>Kode Klasifikasi</Label>
@@ -299,17 +308,27 @@ export function SuratFormDialog({
                 </div>
                 <div className="sm:col-span-3">
                   <Label>Status</Label>
-                  <NativeSelect value={form.status} onChange={set("status")} className="mt-1.5 w-full">
-                    {[...new Set([...STATUS[jenis], form.status])].map((k) => (<option key={k}>{k}</option>))}
-                  </NativeSelect>
+                  <Select value={form.status} onValueChange={(v) => setForm((f) => ({ ...f, status: v ?? "" }))}>
+                    <SelectTrigger className="mt-1.5 w-full">
+                      <SelectValue placeholder="Pilih status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {[...new Set([...STATUS[jenis], form.status])].filter(Boolean).map((k) => (<SelectItem key={k} value={k}>{k}</SelectItem>))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </>
             ) : (
               <div className="sm:col-span-3">
                 <Label>Status</Label>
-                <NativeSelect value={form.status} onChange={set("status")} className="mt-1.5 w-full">
-                  {[...new Set([...STATUS[jenis], form.status])].map((k) => (<option key={k}>{k}</option>))}
-                </NativeSelect>
+                <Select value={form.status} onValueChange={(v) => setForm((f) => ({ ...f, status: v ?? "" }))}>
+                  <SelectTrigger className="mt-1.5 w-full">
+                    <SelectValue placeholder="Pilih status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[...new Set([...STATUS[jenis], form.status])].filter(Boolean).map((k) => (<SelectItem key={k} value={k}>{k}</SelectItem>))}
+                  </SelectContent>
+                </Select>
               </div>
             )}
 
